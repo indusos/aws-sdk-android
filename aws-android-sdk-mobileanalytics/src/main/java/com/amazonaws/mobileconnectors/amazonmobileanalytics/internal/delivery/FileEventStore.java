@@ -65,7 +65,7 @@ public class FileEventStore implements EventStore {
 		
 		// To avoid recording of session start events in event store .
 		// IndusOS has its own session tracking mechanisim to track sessions. 
-		if(event.contains(SESSION_START_EVENT_NAME) == true){
+		if(event.contains(SESSION_START_EVENT_NAME)){
 			return success;
 		}
 
