@@ -41,6 +41,7 @@ public class FileEventStore implements EventStore {
     static final String EVENT_FILE_NAME = "eventsFile";
     static final String KEY_MAX_STORAGE_SIZE = "maxStorageSize";
     static final double ERROR_LENGTH_THRESHOLD_PERCENTAGE = 1.1;
+    static final String SESSION_START_EVENT_NAME = "_session.start";
     private final ReentrantLock accessLock = new ReentrantLock(true);
 
     static long MAX_STORAGE_SIZE = 1024 * 1024 * 5L;
@@ -61,6 +62,12 @@ public class FileEventStore implements EventStore {
     public boolean put(final String event) throws EventStoreException {
         boolean success = false;
         BufferedWriter writer = null;
+		
+		// To avoid recording of session start events in event store .
+		// IndusOS has its own session tracking mechanisim to track sessions. 
+		if(event.contains(SESSION_START_EVENT_NAME) == true){
+			return success;
+		}
 
         accessLock.lock();
         try {
