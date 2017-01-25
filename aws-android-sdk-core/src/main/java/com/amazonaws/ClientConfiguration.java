@@ -22,6 +22,8 @@ import com.amazonaws.util.VersionInfoUtils;
 
 import java.net.InetAddress;
 
+import javax.net.ssl.TrustManager;
+
 /**
  * Client configuration options such as proxy settings, user agent string, max
  * retry attempts, etc.
@@ -166,6 +168,17 @@ public class ClientConfiguration {
      */
     private String signerOverride;
 
+    /**
+     * Optional override to control how to perform authentication for secure
+     * connections.
+     */
+    private TrustManager trustManager = null;
+
+    /**
+     * Enable/disable logging.
+     */
+    private boolean curlLogging = false;
+
     public ClientConfiguration() {
     }
 
@@ -189,6 +202,8 @@ public class ClientConfiguration {
         this.socketReceiveBufferSizeHint = other.socketReceiveBufferSizeHint;
         this.socketSendBufferSizeHint = other.socketSendBufferSizeHint;
         this.signerOverride = other.signerOverride;
+        this.trustManager = other.trustManager;
+        this.curlLogging = other.curlLogging;
     }
 
     /**
@@ -982,6 +997,75 @@ public class ClientConfiguration {
      */
     public ClientConfiguration withPreemptiveBasicProxyAuth(boolean preemptiveBasicProxyAuth) {
         setPreemptiveBasicProxyAuth(preemptiveBasicProxyAuth);
+        return this;
+    }
+
+    /**
+     * Gets the trust manager to use for secure connections from this client. If
+     * null the default authentication will be used.
+     *
+     * @return The trust manager to use for this client, or null to use the
+     *         default authentication for secure connections.
+     */
+    public TrustManager getTrustManager() {
+        return trustManager;
+    }
+
+    /**
+     * Sets the trust manager to use for secure connections from this client. If
+     * null the default authentication will be used.
+     *
+     * @param trustManager The trust manager to use for this client.
+     */
+    public void setTrustManager(TrustManager trustManager) {
+        this.trustManager = trustManager;
+    }
+
+    /**
+     * Sets the trust manager to use for secure connections from this client,
+     * and returns the updated ClientConfiguration object so that additional
+     * calls may be chained together. If null the default authentication will be
+     * used.
+     *
+     * @param trustManager The trust manager to use for this client.
+     * @return The updated ClientConfiguration object.
+     */
+    public ClientConfiguration withTrustManager(TrustManager trustManager) {
+        setTrustManager(trustManager);
+        return this;
+    }
+
+    /**
+     * Tells whether or not the client should be logging anything. Currently,
+     * logging will print curl commands to replay http requests.
+     *
+     * @return Whether or not the client will be logging.
+     */
+    public boolean isCurlLogging() {
+        return curlLogging;
+    }
+
+    /**
+     * Sets whether or not the client should be logging any information. This
+     * should be used for debug builds only. Defaults to false.
+     *
+     * @param logging Whether or not the client should be logging operations.
+     */
+    public void setCurlLogging(boolean curlLogging) {
+        this.curlLogging = curlLogging;
+    }
+
+    /**
+     * Sets whether or not the client should be logging any information. This
+     * should be used for debug builds only, and returns the updated
+     * ClientConfiguration object so that additional calls may be chained
+     * together. Defaults to false.
+     *
+     * @param logging Whether or not the client should be logging operations.
+     * @return The updated ClientConfiguration object.
+     */
+    public ClientConfiguration withCurlLogging(boolean curlLogging) {
+        this.curlLogging = curlLogging;
         return this;
     }
 

@@ -1,12 +1,191 @@
 # Change Log - AWS SDK for Android
+## [Release 2.3.7] (https://github.com/aws/aws-sdk-android/releases/tag/release_v2.3.7) (12/13/2016)
+
+### New Features
+- **Support for Amazon Rekognition**: Rekognition is a deep-learning based service to search, verify and organize images. With Rekognition, you can detect objects, scenes, and faces in images. You can also search and compare faces.
+- **AWS Core Runtime**: Added Support for `eu-west-2`/LHR region in the SDK.
+
+### Improvements
+- **AWS Core Runtime**: Added support for enabling curl logging in the SDK. See [issue](https://github.com/aws/aws-sdk-android/pull/200)
+- **AWS Lambda**: Update to Latest Models.
+
+### Bug Fixes:
+- **Amazon Pinpoint**: Fixed a bug that caused setting wrong endpoint for pinpoint client.
+- **Amazon S3**: Fixed a bug that could cause NPE in Transfer Service. See [issue](https://github.com/aws/aws-sdk-android/issues/223).
+- **Amazon Cognito Identity Provider**: Fix incorrect exception being thrown in `CognitoDevice`. See [issue](https://github.com/aws/aws-sdk-android/pull/224).
+- **Amazon Cognito Identity Provider**: Fix a bug where `NewPasswordContinuation` throws `CognitoParameterInvalidException: Missing required attribute` even when the required user attributes have been set. See [issue](https://github.com/aws/aws-sdk-android/pull/216).
+
+
+## [Release 2.3.6] (https://github.com/aws/aws-sdk-android/releases/tag/release_v2.3.6) (12/07/2016)
+
+### Improvements
+- **AWS Core Runtime**: Added Support for `ca-central-1`/YUL region in the SDK.
+
+### Bug Fixes
+- **Amazon SQS**: Fixed a bug that caused SQS send message to fail. See [issue](https://github.com/aws/aws-sdk-android/issues/218).
+- **Amazon Lex Runtime**: Fixed a bug where requests were not getting signed correctly.
+- **Amazon Pinpoint**: Fix serialization of endpoint profile bug.
+- **Amazon Mobile Analytics**: Ensure session file directories exist before saving
+
+
+## [Release 2.3.5] (https://github.com/aws/aws-sdk-android/releases/tag/release_v2.3.5) (12/01/2016)
+
+### New Features
+- **Support for Amazon Pinpoint**: Amazon Pinpoint makes it easy to run targeted campaigns to improve user engagement. Pinpoint helps you understand your users behavior, define who to target, what messages to send, when to deliver them, and tracks the results of the campaigns.
+
+
+## [Release 2.3.4] (https://github.com/aws/aws-sdk-android/releases/tag/release_v2.3.4) (11/30/2016)
+
+### New Features
+- **Support for Amazon Lex - Beta**: Amazon Lex is a service for building conversational interactions into any application using voice and text. With Lex, the same conversational engine that powers Amazon Alexa is now available to any developer, enabling you to build sophisticated, natural language, conversational bots (chatbots) into your new and existing applications. Amazon Lex provides the deep functionality and flexibility of automatic speech recognition (ASR) for converting speech to text and natural language understanding (NLU) to understand the intent of the text. This allows you to build highly engaging user experiences with lifelike, conversational interactions.
+
+- **Support for Amazon Polly**: Amazon Polly is a service that turns text into lifelike speech, making it easy to develop applications that use high-quality speech to increase engagement and accessibility. With Amazon Polly the developers can build speech-enabled apps that work in multiple geographies.
+
+## [Release 2.3.3] (https://github.com/aws/aws-sdk-android/releases/tag/release_v2.3.3) (10/11/2016)
+
+### Improvements
+- **AWS Core Runtime Library**: Support for `us-east-2/CMH` region in SDK.
+
+## [Release 2.3.2] (https://github.com/aws/aws-sdk-android/releases/tag/release_v2.3.2) (10/06/2016)
+
+### Improvements
+- **Amazon Cognito Identity Provider**: 
+- Support for Admin Create User feature.
+- Allow SDK to refresh tokens which are about to expire within a pre-set threshold.
+
+## [Release 2.3.1](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.3.1) (09/08/2016)
+
+### Improvements
+- **API Gateway**: Added a generic invoker to execute requests for any path.
+
+### Bug Fixes
+- **Amazon Cognito Identity Provider**: 
+- Fixed a bug introduced by StandardCharsets that caused the Android SDK to be unavailable for API 18 and below.
+
+## [Release 2.3.0](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.3.0) (07/28/2016)
+
+### Improvements
+- **AWS Core Runtime Library**: Added support for `us-west-2/PDX` region for cognito identity.
+- **Amazon Cognito Identity Provider**: 
+- Support for Custom authentication flows. Developers can implement custom authentication flows around Cognito Your User Pools.
+- Support for devices.
+- Global sign-out users, to sign-out from all devices.
+- **Amazon Cognito Sync**: Added support for `us-west-2/PDX` region.
+
+### Bug Fixes
+- **Amazon Cognito Identity Provider**: 
+- Authentication flow in Android SDK now uses Custom Authentication API.
+Two new exceptions added for getSession API. These exceptions have been added to accurately represent the user state when the username is invalid and when the user is not confirmed. You will have to update your application to handle these exceptions.
+- UserNotFoundException: Returned when the username user does not exist.
+- UserNotConfirmedException: Returned when the user has not been confirmed.
+
+## [Release 2.2.22](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.2.22) (07/27/2016)
+
+### Bug Fixes
+- **Amazon Simple Email Service**: Resolved an issue where some SES APIs were missing from the 2.2.21. [#179](https://github.com/aws/aws-sdk-android/issues/179)
+
+## [Release 2.2.21](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.2.21) (07/21/2016)
+
+### Improvements
+- **Amazon Web Services**: General service updates and documentation improvements.
+- **AWS Core Runtime Library**: Allow custom `TrustManager` on `ClientConfiguration`. [#165](https://github.com/aws/aws-sdk-android/pull/165)
+- **AWS IoT**: Updated Eclipse Paho MQTT client to v1.1.0. [#145](https://github.com/aws/aws-sdk-android/issues/145)
+
+### Bug Fixes
+- **Amazon Mobile Analytics**: Fixed crash while creating the base directory. [#126](https://github.com/aws/aws-sdk-android/issues/126)
+- **Amazon Cognito**: Fixed a token refresh bug in Your User Pools.
+
+
+## [Release 2.2.20](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.2.20) (06/27/2016)
+
+### New Features
+- **Amazon Web Services**: Introducing new AWS region Asia Pacific (Mumbai) region, endpoint ap-south-1.
+
+### Improvements
+- **Amazon Web Services**: General service updates and documentation improvements.
+- **API Gateway**: Expose client configuration through ApiFactory. [#158](https://github.com/aws/aws-sdk-android/issues/158)
+- **Amazon Web Services**: Service clients are now generated with a new code gen system. Some trivial changes are listed below
+- List members in POJO are defaulted to null instead of an empty list to align with map members. Please perform null check to avoid NPE. When marshalling a list member, a null list will be omitted and an empty list will result in an empty array.
+- In `ListRecordsRequest` of Cognito Sync, the data type of `lastSyncCount` is changed from String to Long and that of `maxResult` from String to Integer.
+- In DynamoDB, the method `setKey(java.util.Map.Entry<String, AttributeValue> hashKey, java.util.Map.Entry<String, AttributeValue> rangeKey)` is removed from `GetItemRequest`, `UpdateItemRequest`, `DeleteItemRequest`, and `DeleteRequest`. Use `addKeyEntry(String key, AttributeValue value)` instead. `setExclusiveStartKey(java.util.Map.Entry<String, AttributeValue> hashKey, java.util.Map.Entry<String, AttributeValue> rangeKey)` is also removed from `QueryRequest` and `ScanRequest`. The alternative is `addExclusiveStartKeyEntry(String key, AttributeValue value)`.
+
+### Bug Fixes
+- **API Gateway**: Fixed a bug where user agent is overwritten by `ApiHandler`. [#159](https://github.com/aws/aws-sdk-android/issues/159) 
+
+
+## [Release 2.2.19](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.2.19) (06/23/2016)
+
+### New Features
+- **Amazon Cognito Identity**: Added support for SAML role resolution.
+
+
+## [Release 2.2.18](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.2.18) (06/02/2016)
+
+### Bug Fixes
+- **AWS Core Runtime Library**: Removed testing implementation for `X509TrustManager`, for more information [see](https://support.google.com/faqs/answer/6346016).
+
+
+## [Release 2.2.17](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.2.17) (05/20/2016)
+
+### New Features
+- **Amazon S3**:
+- Introducing a new version of the ListObjects (ListObjectsV2) API that allows listing objects with a large number of delete markers. See [GET Bucket (List Objects) Version 2](http://docs.aws.amazon.com/AmazonS3/latest/API/v2-RESTBucketGET.html) for more details.
+- Added support for a new configuration named BucketAccelerateConfiguration which supports faster uploads/downloads to S3 buckets. See [Amazon S3 Transfer Acceleration](http://docs.aws.amazon.com/AmazonS3/latest/dev/transfer-acceleration.html).
+- Amazon S3 now supports cross-region replication, which provides automatic, asynchronous copying of objects across buckets in different AWS regions. For more information, see [Cross-Region Replication](https://docs.aws.amazon.com/AmazonS3/latest/dev/crr.html) in the Amazon S3 Developer Guide.
+
+### Bug Fixes
+- **AWS Core Runtime Library**: Fixed a potential bug during retry where content input stream is not reset correctly.
+- **Amazon Cognito**: Fixed a bug where Cognito Sign-in may fail on non US locale environment. [aws-sdk-android-samples #129](https://github.com/awslabs/aws-sdk-android-samples/issues/54)
+
+
+## [Release 2.2.16](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.2.16) (05/10/2016)
+
+### New Features
+- **AWS IoT**: The AWS IoT Device Gateway now supports MQTT over WebSockets. Build real-time mobile and web applications that interact over WebSockets, and easily scale to millions of simultaneous users. You can use WebSockets with Amazon Cognito to securely authenticate end-users to your apps and devices.
+
+### Improvements
+- **Amazon Web Services**: General service updates and documentation improvements.
+- **AWS Core Runtime Library**: Removed verbose logging of errors in retries.
+- **AWS IoT**: Added MQTT message delivery callback.
+
+### Bug Fixes
+- **Amazon S3**: Fixed a bug in TransferUtility caused by socket timeout exception. The exception is incorrectly treated as manually interrupt and thus is not reported to `TransferListener.onError(Exception)`. [#119](https://github.com/aws/aws-sdk-android/issues/119) and [#120](https://github.com/aws/aws-sdk-android/issues/120)
+- **Amazon Cognito**: Fixed a bug caused by `StandardCharsets` which is available from API level 19. [#129](https://github.com/aws/aws-sdk-android/issues/129)
+
+
+## [Release 2.2.15](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.2.15) (04/19/2016)
+
+### New Features
+- **Amazon Cognito Identity Provider**: You can now use Amazon Cognito to easily add user sign-up and sign-in to your mobile and web apps. Your User Pool in Amazon Cognito is a fully managed user directory that can scale to hundreds of millions of users, so you don’t have to worry about building, securing, and scaling a solution to handle user management and authentication.
+- **Amazon S3**: Canned ACL support when uploading objects to S3 with TransferUtility. [#63](https://github.com/aws/aws-sdk-android/issues/63)
+
+### Bug Fixes
+- **Amazon S3**: A NPE bug in TransferUtility caused by network receiver. [#117](https://github.com/aws/aws-sdk-android/issues/117) and [#118](https://github.com/aws/aws-sdk-android/issues/118)
+
+
+## [Release 2.2.14](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.2.14) (03/31/2016)
+
+### New Features
+- **AWS Iot**: Added support for LWT (last will and testimony).
+- **Amazon SES**: Added support for custom MAIL FROM domains.
+
+### Improvements
+- **Amazon S3**: Improved performance of S3 TransferUtility.
+- Now the number of parallel transfers is set to the number of processors (cores) + 1. [#111](https://github.com/aws/aws-sdk-android/issues/111)
+- Removed unnecessary network requests in download task.
+
+### Bug Fixes
+- **AWS Core Runtime Library**: Addressed a potential bug in Cognito credentials provider.
+- **Amazon S3**: Fixed RejectedExecutionException in TransferUtility which may occur when the service is shutting down. [#113](https://github.com/aws/aws-sdk-android/issues/113)
+
 
 ## [Release 2.2.13](https://github.com/aws/aws-sdk-android/releases/tag/release_v2.2.13) (02/25/2016)
 
 ### Improvements
 - **Amazon S3**: Tweaked the usage of TransferListener in S3 TransferUtility.
- - Now listeners are kept as strong references. They will be removed when transfers are completed. However user are still encouraged to clean up listeners themselves to prevent memory leak. [#93](https://github.com/aws/aws-sdk-android/issues/93) and [#101](https://github.com/aws/aws-sdk-android/issues/101)
- - Transfers in WAITING_FOR_NETWORK state can now be paused or canceled. [#102](https://github.com/aws/aws-sdk-android/issues/102)
- - Improved the experience to delete a transfer. [#104](https://github.com/aws/aws-sdk-android/issues/104)
+- Now listeners are kept as strong references. They will be removed when transfers are completed. However user are still encouraged to clean up listeners themselves to prevent memory leak. [#93](https://github.com/aws/aws-sdk-android/issues/93) and [#101](https://github.com/aws/aws-sdk-android/issues/101)
+- Transfers in WAITING_FOR_NETWORK state can now be paused or canceled. [#102](https://github.com/aws/aws-sdk-android/issues/102)
+- Improved the experience to delete a transfer. [#104](https://github.com/aws/aws-sdk-android/issues/104)
 
 ### Bug Fixes
 - **AWS Core Runtime Library**: Addressed potential internalization bugs. [#96](https://github.com/aws/aws-sdk-android/issues/96)
@@ -29,14 +208,14 @@
 
 ### Improvements
 - **Amazon S3**: Revamped S3 TransferUtility. Huge performance boost and lots of enhancements.
- - Offload most database operations to background thread.
- - Re-architected transfer listeners. Moved away from ContentObserver.
- - Reduced the frequency of writing transfer states to database.
- - Better error reporting. Now the original exception is passed to [TransferListener.onError(int, Exception)](http://docs.aws.amazon.com/AWSAndroidSDK/latest/javadoc/com/amazonaws/mobileconnectors/s3/transferutility/TransferListener.html#onError(int,%20java.lang.Exception)). [#61](https://github.com/aws/aws-sdk-android/issues/61)
- - Allow user to resume a transfer in any state other than `TransferState.COMPLETED`. [#81](https://github.com/aws/aws-sdk-android/issues/81) and [#87](https://github.com/aws/aws-sdk-android/issues/87)
- - Better diagnostics of TransferService. You can dump its status with `adb shell dumpsys activity service com.amazonaws.mobileconnectors.s3.transferutility.TransferService`. It works only if the app is debuggable.
- - Better handling of network connectivity changes.
- - Other cleanups, bug fixes and improvements.
+- Offload most database operations to background thread.
+- Re-architected transfer listeners. Moved away from ContentObserver.
+- Reduced the frequency of writing transfer states to database.
+- Better error reporting. Now the original exception is passed to [TransferListener.onError(int, Exception)](http://docs.aws.amazon.com/AWSAndroidSDK/latest/javadoc/com/amazonaws/mobileconnectors/s3/transferutility/TransferListener.html#onError(int,%20java.lang.Exception)). [#61](https://github.com/aws/aws-sdk-android/issues/61)
+- Allow user to resume a transfer in any state other than `TransferState.COMPLETED`. [#81](https://github.com/aws/aws-sdk-android/issues/81) and [#87](https://github.com/aws/aws-sdk-android/issues/87)
+- Better diagnostics of TransferService. You can dump its status with `adb shell dumpsys activity service com.amazonaws.mobileconnectors.s3.transferutility.TransferService`. It works only if the app is debuggable.
+- Better handling of network connectivity changes.
+- Other cleanups, bug fixes and improvements.
 - **Amazon S3**: Adds support of server-side encryption with AWS Key Management Service. See [Amazon S3 developer guide](http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingKMSEncryption.html) for more information.
 - **Amazon S3**: Signature Version 4 is now the default signing methods for all S3 requests as long as a region is specified or can be easily determined from the given endpoint.
 

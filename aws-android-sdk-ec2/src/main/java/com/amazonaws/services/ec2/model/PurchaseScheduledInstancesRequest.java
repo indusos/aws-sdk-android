@@ -29,7 +29,13 @@ import com.amazonaws.services.ec2.model.transform.PurchaseScheduledInstancesRequ
  * Scheduled Instances enable you to purchase Amazon EC2 compute capacity
  * by the hour for a one-year term. Before you can purchase a Scheduled
  * Instance, you must call DescribeScheduledInstanceAvailability to check
- * for available schedules and obtain a purchase token.
+ * for available schedules and obtain a purchase token. After you
+ * purchase a Scheduled Instance, you must call RunScheduledInstances
+ * during each scheduled time period.
+ * </p>
+ * <p>
+ * After you purchase a Scheduled Instance, you can't cancel, modify, or
+ * resell your purchase.
  * </p>
  *
  * @see com.amazonaws.services.ec2.AmazonEC2#purchaseScheduledInstances(PurchaseScheduledInstancesRequest)
@@ -46,6 +52,9 @@ public class PurchaseScheduledInstancesRequest extends AmazonWebServiceRequest i
 
     /**
      * One or more purchase requests.
+     * <p>
+     * <b>Constraints:</b><br/>
+     * <b>Length: </b>1 - <br/>
      */
     private com.amazonaws.internal.ListWithAutoConstructFlag<PurchaseRequest> purchaseRequests;
 
@@ -102,6 +111,9 @@ public class PurchaseScheduledInstancesRequest extends AmazonWebServiceRequest i
 
     /**
      * One or more purchase requests.
+     * <p>
+     * <b>Constraints:</b><br/>
+     * <b>Length: </b>1 - <br/>
      *
      * @return One or more purchase requests.
      */
@@ -115,6 +127,9 @@ public class PurchaseScheduledInstancesRequest extends AmazonWebServiceRequest i
     
     /**
      * One or more purchase requests.
+     * <p>
+     * <b>Constraints:</b><br/>
+     * <b>Length: </b>1 - <br/>
      *
      * @param purchaseRequests One or more purchase requests.
      */
@@ -132,6 +147,9 @@ public class PurchaseScheduledInstancesRequest extends AmazonWebServiceRequest i
      * One or more purchase requests.
      * <p>
      * Returns a reference to this object so that method calls can be chained together.
+     * <p>
+     * <b>Constraints:</b><br/>
+     * <b>Length: </b>1 - <br/>
      *
      * @param purchaseRequests One or more purchase requests.
      *
@@ -150,6 +168,9 @@ public class PurchaseScheduledInstancesRequest extends AmazonWebServiceRequest i
      * One or more purchase requests.
      * <p>
      * Returns a reference to this object so that method calls can be chained together.
+     * <p>
+     * <b>Constraints:</b><br/>
+     * <b>Length: </b>1 - <br/>
      *
      * @param purchaseRequests One or more purchase requests.
      *

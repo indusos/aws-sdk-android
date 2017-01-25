@@ -55,7 +55,18 @@ public class NatGateway implements Serializable {
     private com.amazonaws.internal.ListWithAutoConstructFlag<NatGatewayAddress> natGatewayAddresses;
 
     /**
-     * The state of the NAT gateway.
+     * The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     * NAT gateway is being created and is not ready to process traffic.
+     * </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     * created. Check the <code>failureCode</code> and
+     * <code>failureMessage</code> fields for the reason. </li> <li>
+     * <p><code>available</code>: The NAT gateway is able to process traffic.
+     * This status remains until you delete the NAT gateway, and does not
+     * indicate the health of the NAT gateway. </li> <li>
+     * <p><code>deleting</code>: The NAT gateway is in the process of being
+     * terminated and may still be processing traffic. </li> <li>
+     * <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     * longer processing traffic. </li> </ul>
      * <p>
      * <b>Constraints:</b><br/>
      * <b>Allowed Values: </b>pending, failed, available, deleting, deleted
@@ -67,25 +78,37 @@ public class NatGateway implements Serializable {
      * the failure. (<code>InsufficientFreeAddressesInSubnet</code> |
      * <code>Gateway.NotAttached</code> |
      * <code>InvalidAllocationID.NotFound</code> |
-     * <code>Resource.AlreadyAssociated</code> | <code>InternalError</code>)
+     * <code>Resource.AlreadyAssociated</code> | <code>InternalError</code> |
+     * <code>InvalidSubnetID.NotFound</code>)
      */
     private String failureCode;
 
     /**
      * If the NAT gateway could not be created, specifies the error message
-     * for the failure, that corresponds to the error code. <ul> <li>For
-     * InsufficientFreeAddressesInSubnet: <code>Subnet has insufficient free
-     * addresses to create this NAT gateway</code></li> <li>For
-     * Gateway.NotAttached: <code>Network vpc-xxxxxxxx has no Internet
-     * gateway attached</code></li> <li>For InvalidAllocationID.NotFound:
-     * <code>Elastic IP address eipalloc-xxxxxxxx could not be associated
-     * with this NAT gateway</code></li> <li>For Resource.AlreadyAssociated:
-     * <code>Elastic IP address eipalloc-xxxxxxxx is already
-     * associated</code></li> <li>For InternalError: <code>Network interface
-     * eni-xxxxxxxx, created and used internally by this NAT gateway is in an
-     * invalid state. Please try again.</code></li> </ul>
+     * for the failure, that corresponds to the error code. <ul> <li><p>For
+     * InsufficientFreeAddressesInSubnet: "Subnet has insufficient free
+     * addresses to create this NAT gateway"</li> <li><p>For
+     * Gateway.NotAttached: "Network vpc-xxxxxxxx has no Internet gateway
+     * attached"</li> <li><p>For InvalidAllocationID.NotFound: "Elastic IP
+     * address eipalloc-xxxxxxxx could not be associated with this NAT
+     * gateway"</li> <li><p>For Resource.AlreadyAssociated: "Elastic IP
+     * address eipalloc-xxxxxxxx is already associated"</li> <li><p>For
+     * InternalError: "Network interface eni-xxxxxxxx, created and used
+     * internally by this NAT gateway is in an invalid state. Please try
+     * again."</li> <li><p>For InvalidSubnetID.NotFound: "The specified
+     * subnet subnet-xxxxxxxx does not exist or could not be found."</li>
+     * </ul>
      */
     private String failureMessage;
+
+    /**
+     * Reserved. If you need to sustain traffic greater than the <a
+     * href="http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html">documented
+     * limits</a>, contact us through the <a
+     * href="https://console.aws.amazon.com/support/home?">Support
+     * Center</a>.
+     */
+    private ProvisionedBandwidth provisionedBandwidth;
 
     /**
      * The ID of the VPC in which the NAT gateway is located.
@@ -329,12 +352,34 @@ public class NatGateway implements Serializable {
     }
 
     /**
-     * The state of the NAT gateway.
+     * The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     * NAT gateway is being created and is not ready to process traffic.
+     * </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     * created. Check the <code>failureCode</code> and
+     * <code>failureMessage</code> fields for the reason. </li> <li>
+     * <p><code>available</code>: The NAT gateway is able to process traffic.
+     * This status remains until you delete the NAT gateway, and does not
+     * indicate the health of the NAT gateway. </li> <li>
+     * <p><code>deleting</code>: The NAT gateway is in the process of being
+     * terminated and may still be processing traffic. </li> <li>
+     * <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     * longer processing traffic. </li> </ul>
      * <p>
      * <b>Constraints:</b><br/>
      * <b>Allowed Values: </b>pending, failed, available, deleting, deleted
      *
-     * @return The state of the NAT gateway.
+     * @return The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     *         NAT gateway is being created and is not ready to process traffic.
+     *         </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     *         created. Check the <code>failureCode</code> and
+     *         <code>failureMessage</code> fields for the reason. </li> <li>
+     *         <p><code>available</code>: The NAT gateway is able to process traffic.
+     *         This status remains until you delete the NAT gateway, and does not
+     *         indicate the health of the NAT gateway. </li> <li>
+     *         <p><code>deleting</code>: The NAT gateway is in the process of being
+     *         terminated and may still be processing traffic. </li> <li>
+     *         <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     *         longer processing traffic. </li> </ul>
      *
      * @see NatGatewayState
      */
@@ -343,12 +388,34 @@ public class NatGateway implements Serializable {
     }
     
     /**
-     * The state of the NAT gateway.
+     * The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     * NAT gateway is being created and is not ready to process traffic.
+     * </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     * created. Check the <code>failureCode</code> and
+     * <code>failureMessage</code> fields for the reason. </li> <li>
+     * <p><code>available</code>: The NAT gateway is able to process traffic.
+     * This status remains until you delete the NAT gateway, and does not
+     * indicate the health of the NAT gateway. </li> <li>
+     * <p><code>deleting</code>: The NAT gateway is in the process of being
+     * terminated and may still be processing traffic. </li> <li>
+     * <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     * longer processing traffic. </li> </ul>
      * <p>
      * <b>Constraints:</b><br/>
      * <b>Allowed Values: </b>pending, failed, available, deleting, deleted
      *
-     * @param state The state of the NAT gateway.
+     * @param state The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     *         NAT gateway is being created and is not ready to process traffic.
+     *         </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     *         created. Check the <code>failureCode</code> and
+     *         <code>failureMessage</code> fields for the reason. </li> <li>
+     *         <p><code>available</code>: The NAT gateway is able to process traffic.
+     *         This status remains until you delete the NAT gateway, and does not
+     *         indicate the health of the NAT gateway. </li> <li>
+     *         <p><code>deleting</code>: The NAT gateway is in the process of being
+     *         terminated and may still be processing traffic. </li> <li>
+     *         <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     *         longer processing traffic. </li> </ul>
      *
      * @see NatGatewayState
      */
@@ -357,14 +424,36 @@ public class NatGateway implements Serializable {
     }
     
     /**
-     * The state of the NAT gateway.
+     * The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     * NAT gateway is being created and is not ready to process traffic.
+     * </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     * created. Check the <code>failureCode</code> and
+     * <code>failureMessage</code> fields for the reason. </li> <li>
+     * <p><code>available</code>: The NAT gateway is able to process traffic.
+     * This status remains until you delete the NAT gateway, and does not
+     * indicate the health of the NAT gateway. </li> <li>
+     * <p><code>deleting</code>: The NAT gateway is in the process of being
+     * terminated and may still be processing traffic. </li> <li>
+     * <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     * longer processing traffic. </li> </ul>
      * <p>
      * Returns a reference to this object so that method calls can be chained together.
      * <p>
      * <b>Constraints:</b><br/>
      * <b>Allowed Values: </b>pending, failed, available, deleting, deleted
      *
-     * @param state The state of the NAT gateway.
+     * @param state The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     *         NAT gateway is being created and is not ready to process traffic.
+     *         </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     *         created. Check the <code>failureCode</code> and
+     *         <code>failureMessage</code> fields for the reason. </li> <li>
+     *         <p><code>available</code>: The NAT gateway is able to process traffic.
+     *         This status remains until you delete the NAT gateway, and does not
+     *         indicate the health of the NAT gateway. </li> <li>
+     *         <p><code>deleting</code>: The NAT gateway is in the process of being
+     *         terminated and may still be processing traffic. </li> <li>
+     *         <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     *         longer processing traffic. </li> </ul>
      *
      * @return A reference to this updated object so that method calls can be chained
      *         together.
@@ -377,12 +466,34 @@ public class NatGateway implements Serializable {
     }
 
     /**
-     * The state of the NAT gateway.
+     * The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     * NAT gateway is being created and is not ready to process traffic.
+     * </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     * created. Check the <code>failureCode</code> and
+     * <code>failureMessage</code> fields for the reason. </li> <li>
+     * <p><code>available</code>: The NAT gateway is able to process traffic.
+     * This status remains until you delete the NAT gateway, and does not
+     * indicate the health of the NAT gateway. </li> <li>
+     * <p><code>deleting</code>: The NAT gateway is in the process of being
+     * terminated and may still be processing traffic. </li> <li>
+     * <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     * longer processing traffic. </li> </ul>
      * <p>
      * <b>Constraints:</b><br/>
      * <b>Allowed Values: </b>pending, failed, available, deleting, deleted
      *
-     * @param state The state of the NAT gateway.
+     * @param state The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     *         NAT gateway is being created and is not ready to process traffic.
+     *         </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     *         created. Check the <code>failureCode</code> and
+     *         <code>failureMessage</code> fields for the reason. </li> <li>
+     *         <p><code>available</code>: The NAT gateway is able to process traffic.
+     *         This status remains until you delete the NAT gateway, and does not
+     *         indicate the health of the NAT gateway. </li> <li>
+     *         <p><code>deleting</code>: The NAT gateway is in the process of being
+     *         terminated and may still be processing traffic. </li> <li>
+     *         <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     *         longer processing traffic. </li> </ul>
      *
      * @see NatGatewayState
      */
@@ -391,14 +502,36 @@ public class NatGateway implements Serializable {
     }
     
     /**
-     * The state of the NAT gateway.
+     * The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     * NAT gateway is being created and is not ready to process traffic.
+     * </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     * created. Check the <code>failureCode</code> and
+     * <code>failureMessage</code> fields for the reason. </li> <li>
+     * <p><code>available</code>: The NAT gateway is able to process traffic.
+     * This status remains until you delete the NAT gateway, and does not
+     * indicate the health of the NAT gateway. </li> <li>
+     * <p><code>deleting</code>: The NAT gateway is in the process of being
+     * terminated and may still be processing traffic. </li> <li>
+     * <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     * longer processing traffic. </li> </ul>
      * <p>
      * Returns a reference to this object so that method calls can be chained together.
      * <p>
      * <b>Constraints:</b><br/>
      * <b>Allowed Values: </b>pending, failed, available, deleting, deleted
      *
-     * @param state The state of the NAT gateway.
+     * @param state The state of the NAT gateway. <ul> <li> <p><code>pending</code>: The
+     *         NAT gateway is being created and is not ready to process traffic.
+     *         </li> <li> <p><code>failed</code>: The NAT gateway could not be
+     *         created. Check the <code>failureCode</code> and
+     *         <code>failureMessage</code> fields for the reason. </li> <li>
+     *         <p><code>available</code>: The NAT gateway is able to process traffic.
+     *         This status remains until you delete the NAT gateway, and does not
+     *         indicate the health of the NAT gateway. </li> <li>
+     *         <p><code>deleting</code>: The NAT gateway is in the process of being
+     *         terminated and may still be processing traffic. </li> <li>
+     *         <p><code>deleted</code>: The NAT gateway has been terminated and is no
+     *         longer processing traffic. </li> </ul>
      *
      * @return A reference to this updated object so that method calls can be chained
      *         together.
@@ -415,13 +548,15 @@ public class NatGateway implements Serializable {
      * the failure. (<code>InsufficientFreeAddressesInSubnet</code> |
      * <code>Gateway.NotAttached</code> |
      * <code>InvalidAllocationID.NotFound</code> |
-     * <code>Resource.AlreadyAssociated</code> | <code>InternalError</code>)
+     * <code>Resource.AlreadyAssociated</code> | <code>InternalError</code> |
+     * <code>InvalidSubnetID.NotFound</code>)
      *
      * @return If the NAT gateway could not be created, specifies the error code for
      *         the failure. (<code>InsufficientFreeAddressesInSubnet</code> |
      *         <code>Gateway.NotAttached</code> |
      *         <code>InvalidAllocationID.NotFound</code> |
-     *         <code>Resource.AlreadyAssociated</code> | <code>InternalError</code>)
+     *         <code>Resource.AlreadyAssociated</code> | <code>InternalError</code> |
+     *         <code>InvalidSubnetID.NotFound</code>)
      */
     public String getFailureCode() {
         return failureCode;
@@ -432,13 +567,15 @@ public class NatGateway implements Serializable {
      * the failure. (<code>InsufficientFreeAddressesInSubnet</code> |
      * <code>Gateway.NotAttached</code> |
      * <code>InvalidAllocationID.NotFound</code> |
-     * <code>Resource.AlreadyAssociated</code> | <code>InternalError</code>)
+     * <code>Resource.AlreadyAssociated</code> | <code>InternalError</code> |
+     * <code>InvalidSubnetID.NotFound</code>)
      *
      * @param failureCode If the NAT gateway could not be created, specifies the error code for
      *         the failure. (<code>InsufficientFreeAddressesInSubnet</code> |
      *         <code>Gateway.NotAttached</code> |
      *         <code>InvalidAllocationID.NotFound</code> |
-     *         <code>Resource.AlreadyAssociated</code> | <code>InternalError</code>)
+     *         <code>Resource.AlreadyAssociated</code> | <code>InternalError</code> |
+     *         <code>InvalidSubnetID.NotFound</code>)
      */
     public void setFailureCode(String failureCode) {
         this.failureCode = failureCode;
@@ -449,7 +586,8 @@ public class NatGateway implements Serializable {
      * the failure. (<code>InsufficientFreeAddressesInSubnet</code> |
      * <code>Gateway.NotAttached</code> |
      * <code>InvalidAllocationID.NotFound</code> |
-     * <code>Resource.AlreadyAssociated</code> | <code>InternalError</code>)
+     * <code>Resource.AlreadyAssociated</code> | <code>InternalError</code> |
+     * <code>InvalidSubnetID.NotFound</code>)
      * <p>
      * Returns a reference to this object so that method calls can be chained together.
      *
@@ -457,7 +595,8 @@ public class NatGateway implements Serializable {
      *         the failure. (<code>InsufficientFreeAddressesInSubnet</code> |
      *         <code>Gateway.NotAttached</code> |
      *         <code>InvalidAllocationID.NotFound</code> |
-     *         <code>Resource.AlreadyAssociated</code> | <code>InternalError</code>)
+     *         <code>Resource.AlreadyAssociated</code> | <code>InternalError</code> |
+     *         <code>InvalidSubnetID.NotFound</code>)
      *
      * @return A reference to this updated object so that method calls can be chained
      *         together.
@@ -469,30 +608,34 @@ public class NatGateway implements Serializable {
 
     /**
      * If the NAT gateway could not be created, specifies the error message
-     * for the failure, that corresponds to the error code. <ul> <li>For
-     * InsufficientFreeAddressesInSubnet: <code>Subnet has insufficient free
-     * addresses to create this NAT gateway</code></li> <li>For
-     * Gateway.NotAttached: <code>Network vpc-xxxxxxxx has no Internet
-     * gateway attached</code></li> <li>For InvalidAllocationID.NotFound:
-     * <code>Elastic IP address eipalloc-xxxxxxxx could not be associated
-     * with this NAT gateway</code></li> <li>For Resource.AlreadyAssociated:
-     * <code>Elastic IP address eipalloc-xxxxxxxx is already
-     * associated</code></li> <li>For InternalError: <code>Network interface
-     * eni-xxxxxxxx, created and used internally by this NAT gateway is in an
-     * invalid state. Please try again.</code></li> </ul>
+     * for the failure, that corresponds to the error code. <ul> <li><p>For
+     * InsufficientFreeAddressesInSubnet: "Subnet has insufficient free
+     * addresses to create this NAT gateway"</li> <li><p>For
+     * Gateway.NotAttached: "Network vpc-xxxxxxxx has no Internet gateway
+     * attached"</li> <li><p>For InvalidAllocationID.NotFound: "Elastic IP
+     * address eipalloc-xxxxxxxx could not be associated with this NAT
+     * gateway"</li> <li><p>For Resource.AlreadyAssociated: "Elastic IP
+     * address eipalloc-xxxxxxxx is already associated"</li> <li><p>For
+     * InternalError: "Network interface eni-xxxxxxxx, created and used
+     * internally by this NAT gateway is in an invalid state. Please try
+     * again."</li> <li><p>For InvalidSubnetID.NotFound: "The specified
+     * subnet subnet-xxxxxxxx does not exist or could not be found."</li>
+     * </ul>
      *
      * @return If the NAT gateway could not be created, specifies the error message
-     *         for the failure, that corresponds to the error code. <ul> <li>For
-     *         InsufficientFreeAddressesInSubnet: <code>Subnet has insufficient free
-     *         addresses to create this NAT gateway</code></li> <li>For
-     *         Gateway.NotAttached: <code>Network vpc-xxxxxxxx has no Internet
-     *         gateway attached</code></li> <li>For InvalidAllocationID.NotFound:
-     *         <code>Elastic IP address eipalloc-xxxxxxxx could not be associated
-     *         with this NAT gateway</code></li> <li>For Resource.AlreadyAssociated:
-     *         <code>Elastic IP address eipalloc-xxxxxxxx is already
-     *         associated</code></li> <li>For InternalError: <code>Network interface
-     *         eni-xxxxxxxx, created and used internally by this NAT gateway is in an
-     *         invalid state. Please try again.</code></li> </ul>
+     *         for the failure, that corresponds to the error code. <ul> <li><p>For
+     *         InsufficientFreeAddressesInSubnet: "Subnet has insufficient free
+     *         addresses to create this NAT gateway"</li> <li><p>For
+     *         Gateway.NotAttached: "Network vpc-xxxxxxxx has no Internet gateway
+     *         attached"</li> <li><p>For InvalidAllocationID.NotFound: "Elastic IP
+     *         address eipalloc-xxxxxxxx could not be associated with this NAT
+     *         gateway"</li> <li><p>For Resource.AlreadyAssociated: "Elastic IP
+     *         address eipalloc-xxxxxxxx is already associated"</li> <li><p>For
+     *         InternalError: "Network interface eni-xxxxxxxx, created and used
+     *         internally by this NAT gateway is in an invalid state. Please try
+     *         again."</li> <li><p>For InvalidSubnetID.NotFound: "The specified
+     *         subnet subnet-xxxxxxxx does not exist or could not be found."</li>
+     *         </ul>
      */
     public String getFailureMessage() {
         return failureMessage;
@@ -500,30 +643,34 @@ public class NatGateway implements Serializable {
     
     /**
      * If the NAT gateway could not be created, specifies the error message
-     * for the failure, that corresponds to the error code. <ul> <li>For
-     * InsufficientFreeAddressesInSubnet: <code>Subnet has insufficient free
-     * addresses to create this NAT gateway</code></li> <li>For
-     * Gateway.NotAttached: <code>Network vpc-xxxxxxxx has no Internet
-     * gateway attached</code></li> <li>For InvalidAllocationID.NotFound:
-     * <code>Elastic IP address eipalloc-xxxxxxxx could not be associated
-     * with this NAT gateway</code></li> <li>For Resource.AlreadyAssociated:
-     * <code>Elastic IP address eipalloc-xxxxxxxx is already
-     * associated</code></li> <li>For InternalError: <code>Network interface
-     * eni-xxxxxxxx, created and used internally by this NAT gateway is in an
-     * invalid state. Please try again.</code></li> </ul>
+     * for the failure, that corresponds to the error code. <ul> <li><p>For
+     * InsufficientFreeAddressesInSubnet: "Subnet has insufficient free
+     * addresses to create this NAT gateway"</li> <li><p>For
+     * Gateway.NotAttached: "Network vpc-xxxxxxxx has no Internet gateway
+     * attached"</li> <li><p>For InvalidAllocationID.NotFound: "Elastic IP
+     * address eipalloc-xxxxxxxx could not be associated with this NAT
+     * gateway"</li> <li><p>For Resource.AlreadyAssociated: "Elastic IP
+     * address eipalloc-xxxxxxxx is already associated"</li> <li><p>For
+     * InternalError: "Network interface eni-xxxxxxxx, created and used
+     * internally by this NAT gateway is in an invalid state. Please try
+     * again."</li> <li><p>For InvalidSubnetID.NotFound: "The specified
+     * subnet subnet-xxxxxxxx does not exist or could not be found."</li>
+     * </ul>
      *
      * @param failureMessage If the NAT gateway could not be created, specifies the error message
-     *         for the failure, that corresponds to the error code. <ul> <li>For
-     *         InsufficientFreeAddressesInSubnet: <code>Subnet has insufficient free
-     *         addresses to create this NAT gateway</code></li> <li>For
-     *         Gateway.NotAttached: <code>Network vpc-xxxxxxxx has no Internet
-     *         gateway attached</code></li> <li>For InvalidAllocationID.NotFound:
-     *         <code>Elastic IP address eipalloc-xxxxxxxx could not be associated
-     *         with this NAT gateway</code></li> <li>For Resource.AlreadyAssociated:
-     *         <code>Elastic IP address eipalloc-xxxxxxxx is already
-     *         associated</code></li> <li>For InternalError: <code>Network interface
-     *         eni-xxxxxxxx, created and used internally by this NAT gateway is in an
-     *         invalid state. Please try again.</code></li> </ul>
+     *         for the failure, that corresponds to the error code. <ul> <li><p>For
+     *         InsufficientFreeAddressesInSubnet: "Subnet has insufficient free
+     *         addresses to create this NAT gateway"</li> <li><p>For
+     *         Gateway.NotAttached: "Network vpc-xxxxxxxx has no Internet gateway
+     *         attached"</li> <li><p>For InvalidAllocationID.NotFound: "Elastic IP
+     *         address eipalloc-xxxxxxxx could not be associated with this NAT
+     *         gateway"</li> <li><p>For Resource.AlreadyAssociated: "Elastic IP
+     *         address eipalloc-xxxxxxxx is already associated"</li> <li><p>For
+     *         InternalError: "Network interface eni-xxxxxxxx, created and used
+     *         internally by this NAT gateway is in an invalid state. Please try
+     *         again."</li> <li><p>For InvalidSubnetID.NotFound: "The specified
+     *         subnet subnet-xxxxxxxx does not exist or could not be found."</li>
+     *         </ul>
      */
     public void setFailureMessage(String failureMessage) {
         this.failureMessage = failureMessage;
@@ -531,38 +678,99 @@ public class NatGateway implements Serializable {
     
     /**
      * If the NAT gateway could not be created, specifies the error message
-     * for the failure, that corresponds to the error code. <ul> <li>For
-     * InsufficientFreeAddressesInSubnet: <code>Subnet has insufficient free
-     * addresses to create this NAT gateway</code></li> <li>For
-     * Gateway.NotAttached: <code>Network vpc-xxxxxxxx has no Internet
-     * gateway attached</code></li> <li>For InvalidAllocationID.NotFound:
-     * <code>Elastic IP address eipalloc-xxxxxxxx could not be associated
-     * with this NAT gateway</code></li> <li>For Resource.AlreadyAssociated:
-     * <code>Elastic IP address eipalloc-xxxxxxxx is already
-     * associated</code></li> <li>For InternalError: <code>Network interface
-     * eni-xxxxxxxx, created and used internally by this NAT gateway is in an
-     * invalid state. Please try again.</code></li> </ul>
+     * for the failure, that corresponds to the error code. <ul> <li><p>For
+     * InsufficientFreeAddressesInSubnet: "Subnet has insufficient free
+     * addresses to create this NAT gateway"</li> <li><p>For
+     * Gateway.NotAttached: "Network vpc-xxxxxxxx has no Internet gateway
+     * attached"</li> <li><p>For InvalidAllocationID.NotFound: "Elastic IP
+     * address eipalloc-xxxxxxxx could not be associated with this NAT
+     * gateway"</li> <li><p>For Resource.AlreadyAssociated: "Elastic IP
+     * address eipalloc-xxxxxxxx is already associated"</li> <li><p>For
+     * InternalError: "Network interface eni-xxxxxxxx, created and used
+     * internally by this NAT gateway is in an invalid state. Please try
+     * again."</li> <li><p>For InvalidSubnetID.NotFound: "The specified
+     * subnet subnet-xxxxxxxx does not exist or could not be found."</li>
+     * </ul>
      * <p>
      * Returns a reference to this object so that method calls can be chained together.
      *
      * @param failureMessage If the NAT gateway could not be created, specifies the error message
-     *         for the failure, that corresponds to the error code. <ul> <li>For
-     *         InsufficientFreeAddressesInSubnet: <code>Subnet has insufficient free
-     *         addresses to create this NAT gateway</code></li> <li>For
-     *         Gateway.NotAttached: <code>Network vpc-xxxxxxxx has no Internet
-     *         gateway attached</code></li> <li>For InvalidAllocationID.NotFound:
-     *         <code>Elastic IP address eipalloc-xxxxxxxx could not be associated
-     *         with this NAT gateway</code></li> <li>For Resource.AlreadyAssociated:
-     *         <code>Elastic IP address eipalloc-xxxxxxxx is already
-     *         associated</code></li> <li>For InternalError: <code>Network interface
-     *         eni-xxxxxxxx, created and used internally by this NAT gateway is in an
-     *         invalid state. Please try again.</code></li> </ul>
+     *         for the failure, that corresponds to the error code. <ul> <li><p>For
+     *         InsufficientFreeAddressesInSubnet: "Subnet has insufficient free
+     *         addresses to create this NAT gateway"</li> <li><p>For
+     *         Gateway.NotAttached: "Network vpc-xxxxxxxx has no Internet gateway
+     *         attached"</li> <li><p>For InvalidAllocationID.NotFound: "Elastic IP
+     *         address eipalloc-xxxxxxxx could not be associated with this NAT
+     *         gateway"</li> <li><p>For Resource.AlreadyAssociated: "Elastic IP
+     *         address eipalloc-xxxxxxxx is already associated"</li> <li><p>For
+     *         InternalError: "Network interface eni-xxxxxxxx, created and used
+     *         internally by this NAT gateway is in an invalid state. Please try
+     *         again."</li> <li><p>For InvalidSubnetID.NotFound: "The specified
+     *         subnet subnet-xxxxxxxx does not exist or could not be found."</li>
+     *         </ul>
      *
      * @return A reference to this updated object so that method calls can be chained
      *         together.
      */
     public NatGateway withFailureMessage(String failureMessage) {
         this.failureMessage = failureMessage;
+        return this;
+    }
+
+    /**
+     * Reserved. If you need to sustain traffic greater than the <a
+     * href="http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html">documented
+     * limits</a>, contact us through the <a
+     * href="https://console.aws.amazon.com/support/home?">Support
+     * Center</a>.
+     *
+     * @return Reserved. If you need to sustain traffic greater than the <a
+     *         href="http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html">documented
+     *         limits</a>, contact us through the <a
+     *         href="https://console.aws.amazon.com/support/home?">Support
+     *         Center</a>.
+     */
+    public ProvisionedBandwidth getProvisionedBandwidth() {
+        return provisionedBandwidth;
+    }
+    
+    /**
+     * Reserved. If you need to sustain traffic greater than the <a
+     * href="http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html">documented
+     * limits</a>, contact us through the <a
+     * href="https://console.aws.amazon.com/support/home?">Support
+     * Center</a>.
+     *
+     * @param provisionedBandwidth Reserved. If you need to sustain traffic greater than the <a
+     *         href="http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html">documented
+     *         limits</a>, contact us through the <a
+     *         href="https://console.aws.amazon.com/support/home?">Support
+     *         Center</a>.
+     */
+    public void setProvisionedBandwidth(ProvisionedBandwidth provisionedBandwidth) {
+        this.provisionedBandwidth = provisionedBandwidth;
+    }
+    
+    /**
+     * Reserved. If you need to sustain traffic greater than the <a
+     * href="http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html">documented
+     * limits</a>, contact us through the <a
+     * href="https://console.aws.amazon.com/support/home?">Support
+     * Center</a>.
+     * <p>
+     * Returns a reference to this object so that method calls can be chained together.
+     *
+     * @param provisionedBandwidth Reserved. If you need to sustain traffic greater than the <a
+     *         href="http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-nat-gateway.html">documented
+     *         limits</a>, contact us through the <a
+     *         href="https://console.aws.amazon.com/support/home?">Support
+     *         Center</a>.
+     *
+     * @return A reference to this updated object so that method calls can be chained
+     *         together.
+     */
+    public NatGateway withProvisionedBandwidth(ProvisionedBandwidth provisionedBandwidth) {
+        this.provisionedBandwidth = provisionedBandwidth;
         return this;
     }
 
@@ -586,7 +794,8 @@ public class NatGateway implements Serializable {
         if (getNatGatewayAddresses() != null) sb.append("NatGatewayAddresses: " + getNatGatewayAddresses() + ",");
         if (getState() != null) sb.append("State: " + getState() + ",");
         if (getFailureCode() != null) sb.append("FailureCode: " + getFailureCode() + ",");
-        if (getFailureMessage() != null) sb.append("FailureMessage: " + getFailureMessage() );
+        if (getFailureMessage() != null) sb.append("FailureMessage: " + getFailureMessage() + ",");
+        if (getProvisionedBandwidth() != null) sb.append("ProvisionedBandwidth: " + getProvisionedBandwidth() );
         sb.append("}");
         return sb.toString();
     }
@@ -605,6 +814,7 @@ public class NatGateway implements Serializable {
         hashCode = prime * hashCode + ((getState() == null) ? 0 : getState().hashCode()); 
         hashCode = prime * hashCode + ((getFailureCode() == null) ? 0 : getFailureCode().hashCode()); 
         hashCode = prime * hashCode + ((getFailureMessage() == null) ? 0 : getFailureMessage().hashCode()); 
+        hashCode = prime * hashCode + ((getProvisionedBandwidth() == null) ? 0 : getProvisionedBandwidth().hashCode()); 
         return hashCode;
     }
     
@@ -634,6 +844,8 @@ public class NatGateway implements Serializable {
         if (other.getFailureCode() != null && other.getFailureCode().equals(this.getFailureCode()) == false) return false; 
         if (other.getFailureMessage() == null ^ this.getFailureMessage() == null) return false;
         if (other.getFailureMessage() != null && other.getFailureMessage().equals(this.getFailureMessage()) == false) return false; 
+        if (other.getProvisionedBandwidth() == null ^ this.getProvisionedBandwidth() == null) return false;
+        if (other.getProvisionedBandwidth() != null && other.getProvisionedBandwidth().equals(this.getProvisionedBandwidth()) == false) return false; 
         return true;
     }
     

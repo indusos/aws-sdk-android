@@ -1,5 +1,5 @@
 /**
- * Copyright 2011-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2011-2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,7 @@ public class CognitoCredentialsProvider implements AWSCredentialsProvider {
     protected int refreshThreshold;
     protected String unauthRoleArn;
     protected String authRoleArn;
+    protected String customRoleArn;
 
     protected boolean useEnhancedFlow;
 
@@ -468,10 +469,33 @@ public class CognitoCredentialsProvider implements AWSCredentialsProvider {
      */
     public void setLogins(Map<String, String> logins) {
         identityProvider.setLogins(logins);
-        this.sessionCredentials = null;
+        clearCredentials();
+    }
+
+        
+    /**
+     * Get the custom role arn associated with the credentials provider.
+     * 
+     * @return Custom role arn.
+     */
+    public String getCustomRoleArn() {
+        return customRoleArn;
     }
 
     /**
+     * Set the custom role arn that will be used to get credentials with Amazon
+     * Cognito. This parameter needs to be set when idp provides roles in the
+     * token (eg: SAML Assertion) and there are multiple roles. Roles set by the
+     * method will be assumed when it matches with the roles received in the
+     * token from IdP.
+     * 
+     * @param customRoleArn The role arn to be used to get the credentials.
+     */
+    public void setCustomRoleArn(String customRoleArn) {
+        this.customRoleArn = customRoleArn;
+    }
+
+	/**
      * Set the logins map used to authenticated with Amazon Cognito. Returns a
      * reference to the object so methods can be chained. Note: You should
      * manually call refresh on on the credentials provider after adding logins
@@ -595,7 +619,7 @@ public class CognitoCredentialsProvider implements AWSCredentialsProvider {
 
         GetCredentialsForIdentityRequest request = new GetCredentialsForIdentityRequest()
                 .withIdentityId(getIdentityId())
-                .withLogins(logins);
+                .withLogins(logins).withCustomRoleArn(customRoleArn);
 
         return cib.getCredentialsForIdentity(request);
     }
@@ -619,7 +643,7 @@ public class CognitoCredentialsProvider implements AWSCredentialsProvider {
 
         GetCredentialsForIdentityRequest request = new GetCredentialsForIdentityRequest()
                 .withIdentityId(getIdentityId())
-                .withLogins(logins);
+                .withLogins(logins).withCustomRoleArn(customRoleArn);
 
         GetCredentialsForIdentityResult result = null;
 

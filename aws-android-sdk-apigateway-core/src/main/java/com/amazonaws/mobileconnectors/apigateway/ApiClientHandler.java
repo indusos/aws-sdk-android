@@ -67,30 +67,62 @@ class ApiClientHandler implements InvocationHandler {
     private final ClientConfiguration clientConfiguration;
 
     ApiClientHandler(String endpoint, String apiName,
-            Signer signer, AWSCredentialsProvider provider, String apiKey) {
+            Signer signer, AWSCredentialsProvider provider, String apiKey, ClientConfiguration clientConfiguration) {
         this.endpoint = endpoint;
         this.apiName = apiName;
         this.signer = signer;
         this.provider = provider;
         this.apiKey = apiKey;
+        this.clientConfiguration = clientConfiguration;
 
-        clientConfiguration = new ClientConfiguration();
-        client = new UrlHttpClient(clientConfiguration);
+        client = new UrlHttpClient(this.clientConfiguration);
         requestFactory = new HttpRequestFactory();
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable {
-        Request<?> request = buildRequest(method, args);
 
-        ExecutionContext context = new ExecutionContext();
-        context.setContextUserAgent(apiName);
-        HttpRequest httpRequest = requestFactory.createHttpRequest(request, clientConfiguration,
-                context);
-        HttpResponse response = client.execute(httpRequest);
+        try {
+            // the execute method call flow
+            if (isExecuteMethod(method)) {
+                final HttpRequest httpRequest = invokeExecuteMethod(args);
+                final HttpResponse response = client.execute(httpRequest);
 
-        return handleResponse(response, method);
+                return new ApiResponse(response);
+            } else {
+                final HttpRequest httpRequest = createHttpRequest(method, args);
+                final HttpResponse response = client.execute(httpRequest);
+
+                return handleResponse(response, method);
+            }
+
+        } catch (final ApiClientException ace) {
+            throw ace;
+        } catch (final Exception e) {
+            final String msg = e.getMessage() == null ? "" : e.getMessage();
+            throw new ApiClientException(msg, e);
+        }
+    }
+
+    /**
+     * Build a {@link HttpRequest} object for the given method.
+     *
+     * @param method method that annotated with {@link Operation}
+     * @param args arguments of the method
+     * @return a {@link HttpRequest} object
+     */
+    HttpRequest createHttpRequest(Method method, Object[] args) {
+        final Request<?> request = buildRequest(method, args);
+
+        final ExecutionContext context = new ExecutionContext();
+        String userAgent = apiName;
+        if (request.getHeaders().containsKey("User-Agent")) {
+            // append it to execution context
+            userAgent += " " + request.getHeaders().get("User-Agent");
+        }
+        context.setContextUserAgent(userAgent);
+        return requestFactory.createHttpRequest(request, clientConfiguration, context);
     }
 
     /**
@@ -101,18 +133,18 @@ class ApiClientHandler implements InvocationHandler {
      * @return a {@link Request} object
      */
     Request<?> buildRequest(Method method, Object[] args) {
-        Operation op = method.getAnnotation(Operation.class);
+        final Operation op = method.getAnnotation(Operation.class);
         if (op == null) {
             throw new IllegalArgumentException("Method isn't annotated with Operation");
         }
 
-        Request<?> request = new DefaultRequest<Object>(apiName);
+        final Request<?> request = new DefaultRequest<Object>(apiName);
         request.setResourcePath(op.path());
         request.setEndpoint(URI.create(endpoint));
 
         String content = null;
-        Annotation[][] annotations = method.getParameterAnnotations();
-        int length = annotations.length;
+        final Annotation[][] annotations = method.getParameterAnnotations();
+        final int length = annotations.length;
         for (int i = 0; i < length; i++) {
             // content body
             if (annotations[i].length == 0) {
@@ -123,7 +155,7 @@ class ApiClientHandler implements InvocationHandler {
                 continue;
             }
 
-            for (Annotation annotation : annotations[i]) {
+            for (final Annotation annotation : annotations[i]) {
                 if (annotation instanceof Parameter) {
                     processParameter(request, (Parameter) annotation, args[i]);
                     break;
@@ -131,21 +163,24 @@ class ApiClientHandler implements InvocationHandler {
             }
         }
 
-        boolean hasContent = content != null;
+        final boolean hasContent = content != null;
         setHttpMethod(request, op.method(), hasContent);
 
         if (hasContent) {
-            byte[] contentBytes = content.getBytes(StringUtils.UTF8);
+            final byte[] contentBytes = content.getBytes(StringUtils.UTF8);
             request.setContent(new ByteArrayInputStream(contentBytes));
-            request.addHeader("Content-Length",
-                    String.valueOf(contentBytes.length));
+            request.addHeader("Content-Length", String.valueOf(contentBytes.length));
         }
+
         request.addHeader("Content-Type", "application/json");
         request.addHeader("Accept", "application/json");
+
+        // add the api key
         if (apiKey != null) {
             request.addHeader("x-api-key", apiKey);
         }
 
+        // sign the request
         if (provider != null && signer != null) {
             signer.sign(request, provider.getCredentials());
         }
@@ -160,8 +195,8 @@ class ApiClientHandler implements InvocationHandler {
      * @param arg argument
      */
     void processParameter(Request<?> request, Parameter p, Object arg) {
-        String name = p.name();
-        String location = p.location();
+        final String name = p.name();
+        final String location = p.location();
 
         if ("header".equals(location)) {
             request.addHeader(name, String.valueOf(arg));
@@ -172,8 +207,9 @@ class ApiClientHandler implements InvocationHandler {
         } else if ("query".equals(location)) {
             if (Map.class.isAssignableFrom(arg.getClass())) {
                 @SuppressWarnings("unchecked")
+                final
                 Map<String, Object> map = (Map<String, Object>) arg;
-                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                for (final Map.Entry<String, Object> entry : map.entrySet()) {
                     request.addParameter(entry.getKey(), String.valueOf(entry.getValue()));
                 }
             } else if (Collection.class.isAssignableFrom(arg.getClass())) {
@@ -198,7 +234,7 @@ class ApiClientHandler implements InvocationHandler {
     void setHttpMethod(Request<?> request, String httpMethod, boolean hasContent) {
         try {
             request.setHttpMethod(HttpMethodName.valueOf(httpMethod));
-        } catch (IllegalArgumentException iae) {
+        } catch (final IllegalArgumentException iae) {
             // if an HTTP method is unsupported, then 'tunnel' it through
             // another method by setting the intended method in the
             // X-HTTP-Method-Override header.
@@ -218,14 +254,15 @@ class ApiClientHandler implements InvocationHandler {
      * @throws Throwable
      */
     Object handleResponse(HttpResponse response, Method method) throws Throwable {
-        int code = response.getStatusCode();
-        InputStream content = response.getContent();
+        final int code = response.getStatusCode();
+        final InputStream content = response.getContent();
         // successful request if code is 2xx
         if (code >= 200 && code < 300) {
-            Type t = method.getReturnType();
+            final Type t = method.getReturnType();
             if (t != void.class && content != null) {
-                Reader reader = new InputStreamReader(response.getContent(), StringUtils.UTF8);
-                Object obj = gson.fromJson(reader, t);
+                final Reader reader = new InputStreamReader(response.getContent(),
+                        StringUtils.UTF8);
+                final Object obj = gson.fromJson(reader, t);
                 reader.close();
                 return obj;
             } else {
@@ -236,11 +273,11 @@ class ApiClientHandler implements InvocationHandler {
                 return null;
             }
         } else {
-            String error = content == null ? "" : IOUtils.toString(content);
-            ApiClientException ase = new ApiClientException(error);
+            final String error = content == null ? "" : IOUtils.toString(content);
+            final ApiClientException ase = new ApiClientException(error);
             ase.setStatusCode(response.getStatusCode());
             ase.setServiceName(apiName);
-            String requestId = response.getHeaders().get("x-amzn-RequestId");
+            final String requestId = response.getHeaders().get("x-amzn-RequestId");
             if (requestId != null) {
                 ase.setRequestId(requestId);
             }
@@ -248,13 +285,49 @@ class ApiClientHandler implements InvocationHandler {
         }
     }
 
+    boolean isExecuteMethod(Method method) {
+        final Operation op = method.getAnnotation(Operation.class);
+        return op == null && method.getName().equalsIgnoreCase("execute")
+                && method.getReturnType().isAssignableFrom(ApiResponse.class)
+                && method.getParameterTypes().length == 1
+                && method.getParameterTypes()[0].isAssignableFrom(ApiRequest.class);
+    }
+
+    HttpRequest invokeExecuteMethod(Object[] args) {
+        final ExecutionContext context = new ExecutionContext();
+
+        final Request<?> request = ((ApiRequest) args[0]).getRequest();
+        if (request.getEndpoint() == null) {
+            request.setEndpoint(URI.create(endpoint));
+        }
+
+        String userAgent = apiName;
+        if (request.getHeaders().containsKey("User-Agent")) {
+            // append it to execution context
+            userAgent += " " + request.getHeaders().get("User-Agent");
+        }
+        context.setContextUserAgent(userAgent);
+
+        // add the api key
+        if (apiKey != null) {
+            request.addHeader("x-api-key", apiKey);
+        }
+
+        // sign the request
+        if (provider != null && signer != null) {
+            signer.sign(request, provider.getCredentials());
+        }
+
+        return requestFactory.createHttpRequest(request, clientConfiguration, context);
+    }
+
     private String joinList(Collection<?> objects) {
         if (objects == null || objects.isEmpty()) {
             return "";
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for (Object object : objects) {
+        for (final Object object : objects) {
             if (first) {
                 first = false;
             } else {

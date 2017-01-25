@@ -19,6 +19,7 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferService.NetworkInfoReceiver;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AbortMultipartUploadRequest;
 import com.amazonaws.util.json.JsonUtils;
@@ -75,6 +76,7 @@ class TransferRecord {
     public String sseAlgorithm;
     public String sseKMSKey;
     public String md5;
+    public String cannedAcl;
 
     private Future<?> submittedTask;
 
@@ -141,6 +143,7 @@ class TransferRecord {
                 .getString(c.getColumnIndexOrThrow(TransferTable.COLUMN_SSE_ALGORITHM));
         this.sseKMSKey = c.getString(c.getColumnIndexOrThrow(TransferTable.COLUMN_SSE_KMS_KEY));
         this.md5 = c.getString(c.getColumnIndexOrThrow(TransferTable.COLUMN_CONTENT_MD5));
+        this.cannedAcl = c.getString(c.getColumnIndexOrThrow(TransferTable.COLUMN_CANNED_ACL));
     }
 
     /**
@@ -150,15 +153,18 @@ class TransferRecord {
      * @param s3 s3 instance
      * @param dbUtil database util
      * @param updater status updater
+     * @param networkInfo network info
      * @return Whether the task is running.
      */
-    public boolean start(AmazonS3 s3, TransferDBUtil dbUtil, TransferStatusUpdater updater) {
+    public boolean start(AmazonS3 s3, TransferDBUtil dbUtil, TransferStatusUpdater updater,
+            NetworkInfoReceiver networkInfo) {
         if (!isRunning() && checkIsReadyToRun()) {
             if (type.equals(TransferType.DOWNLOAD)) {
-                submittedTask = TransferThreadPool.submitTask(new DownloadTask(this, s3, updater));
+                submittedTask = TransferThreadPool
+                        .submitTask(new DownloadTask(this, s3, updater, networkInfo));
             } else {
-                submittedTask = TransferThreadPool.submitTask(new UploadTask(this, s3, dbUtil,
-                        updater));
+                submittedTask = TransferThreadPool
+                        .submitTask(new UploadTask(this, s3, dbUtil, updater, networkInfo));
             }
             return true;
         }
@@ -174,7 +180,7 @@ class TransferRecord {
      *         otherwise
      */
     public boolean pause(AmazonS3 s3, TransferStatusUpdater updater) {
-        if (!isFinalState(state)) {
+        if (!isFinalState(state) && !TransferState.PAUSED.equals(state)) {
             updater.updateState(id, TransferState.PAUSED);
             if (isRunning()) {
                 submittedTask.cancel(true);
@@ -263,18 +269,19 @@ class TransferRecord {
         StringBuilder sb = new StringBuilder();
         sb.append("[")
                 .append("id:").append(id).append(",")
+                .append("bucketName:").append(bucketName).append(",")
+                .append("key:").append(key).append(",")
+                .append("file:").append(file).append(",")
+                .append("type:").append(type).append(",")
+                .append("bytesTotal:").append(bytesTotal).append(",")
+                .append("bytesCurrent:").append(bytesCurrent).append(",")
+                .append("fileOffset:").append(fileOffset).append(",")
+                .append("state:").append(state).append(",")
+                .append("cannedAcl:").append(cannedAcl).append(",")
                 .append("mainUploadId:").append(mainUploadId).append(",")
                 .append("isMultipart:").append(isMultipart).append(",")
                 .append("isLastPart:").append(isLastPart).append(",")
                 .append("partNumber:").append(partNumber).append(",")
-                .append("bytesTotal:").append(bytesTotal).append(",")
-                .append("bytesCurrent:").append(bytesCurrent).append(",")
-                .append("fileOffset:").append(fileOffset).append(",")
-                .append("type:").append(type).append(",")
-                .append("state:").append(state).append(",")
-                .append("bucketName:").append(bucketName).append(",")
-                .append("key:").append(key).append(",")
-                .append("file:").append(file).append(",")
                 .append("multipartId:").append(multipartId).append(",")
                 .append("eTag:").append(eTag)
                 .append("]");

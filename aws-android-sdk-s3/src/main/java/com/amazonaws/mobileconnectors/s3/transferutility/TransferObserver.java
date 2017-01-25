@@ -51,6 +51,8 @@ public class TransferObserver {
     private final int id;
     private final TransferDBUtil dbUtil;
 
+    private String bucket;
+    private String key;
     private long bytesTotal;
     private long bytesTransferred;
     private TransferState transferState;
@@ -65,11 +67,15 @@ public class TransferObserver {
      *
      * @param id The transfer id of the transfer to be observed.
      * @param dbUtil an instance of database utility
+     * @param bucket bucket of the S3 object
+     * @param key key of the S3 object
      * @param file a file associated with this transfer
      */
-    TransferObserver(int id, TransferDBUtil dbUtil, File file) {
+    TransferObserver(int id, TransferDBUtil dbUtil, String bucket, String key, File file) {
         this.id = id;
         this.dbUtil = dbUtil;
+        this.bucket = bucket;
+        this.key = key;
         filePath = file.getAbsolutePath();
         bytesTotal = file.length();
         transferState = TransferState.WAITING;
@@ -94,7 +100,7 @@ public class TransferObserver {
      * TransferListener is set, then there's no need to call this method.
      */
     public void refresh() {
-        Cursor c = dbUtil.queryTransferById(id);
+        final Cursor c = dbUtil.queryTransferById(id);
         try {
             if (c.moveToFirst()) {
                 updateFromDB(c);
@@ -110,6 +116,8 @@ public class TransferObserver {
      * @param c a cursor to read the state of the transfer from
      */
     private void updateFromDB(Cursor c) {
+        bucket = c.getString(c.getColumnIndexOrThrow(TransferTable.COLUMN_BUCKET_NAME));
+        key = c.getString(c.getColumnIndexOrThrow(TransferTable.COLUMN_KEY));
         bytesTotal = c.getLong(c.getColumnIndexOrThrow(TransferTable.COLUMN_BYTES_TOTAL));
         bytesTransferred = c.getLong(c
                 .getColumnIndexOrThrow(TransferTable.COLUMN_BYTES_CURRENT));
@@ -148,6 +156,24 @@ public class TransferObserver {
      */
     public int getId() {
         return id;
+    }
+
+    /**
+     * Gets the bucket name of the record.
+     *
+     * @return The bucket name of the record.
+     */
+    public String getBucket() {
+        return bucket;
+    }
+
+    /**
+     * Gets the key of the record.
+     *
+     * @return The key of the record.
+     */
+    public String getKey() {
+        return key;
     }
 
     /**
@@ -213,7 +239,7 @@ public class TransferObserver {
 
         @Override
         public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-            bytesTransferred = bytesCurrent;
+            TransferObserver.this.bytesTransferred = bytesCurrent;
             TransferObserver.this.bytesTotal = bytesTotal;
         }
 

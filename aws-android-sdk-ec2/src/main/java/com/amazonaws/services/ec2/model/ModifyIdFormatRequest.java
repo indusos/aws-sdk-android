@@ -25,17 +25,25 @@ import com.amazonaws.AmazonWebServiceRequest;
  * basis. You can specify that resources should receive longer IDs
  * (17-character IDs) when they are created. The following resource types
  * support longer IDs: <code>instance</code> |
- * 
- * <code>reservation</code> .
+ * <code>reservation</code> |
+ * <code>snapshot</code> |
+ * <code>volume</code> .
  * </p>
  * <p>
  * This setting applies to the IAM user who makes the request; it does
  * not apply to the entire AWS account. By default, an IAM user defaults
- * to the same settings as the root user, unless they explicitly override
- * the settings by running this request. Resources created with longer
- * IDs are visible to all IAM users, regardless of these settings and
- * provided that they have permission to use the relevant
- * <code>Describe</code> command for the resource type.
+ * to the same settings as the root user. If you're using this action as
+ * the root user or as an IAM role that has permission to use this
+ * action, then these settings apply to the entire account, unless an IAM
+ * user explicitly overrides these settings for themselves. For more
+ * information, see
+ * <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/resource-ids.html#resource-ids-access"> Controlling Access to Longer ID Settings </a>
+ * in the <i>Amazon Elastic Compute Cloud User Guide</i> .
+ * </p>
+ * <p>
+ * Resources created with longer IDs are visible to all IAM users,
+ * regardless of these settings and provided that they have permission to
+ * use the relevant <code>Describe</code> command for the resource type.
  * </p>
  *
  * @see com.amazonaws.services.ec2.AmazonEC2#modifyIdFormat(ModifyIdFormatRequest)

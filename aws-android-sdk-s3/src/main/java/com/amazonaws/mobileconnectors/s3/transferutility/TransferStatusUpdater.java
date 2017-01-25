@@ -139,7 +139,7 @@ class TransferStatusUpdater {
      */
     void updateState(final int id, final TransferState newState) {
         boolean shouldNotNotify = STATES_NOT_TO_NOTIFY.contains(newState);
-        TransferRecord transfer = transfers.get(id);
+        final TransferRecord transfer = transfers.get(id);
         if (transfer == null) {
             // still wants to save state
             if (dbUtil.updateState(id, newState) == 0) {
@@ -168,7 +168,7 @@ class TransferStatusUpdater {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (TransferListener l : list) {
+                for (final TransferListener l : list) {
                     l.onStateChanged(id, newState);
                 }
                 // remove all listeners when the transfer is in a final state so
@@ -192,11 +192,19 @@ class TransferStatusUpdater {
      * @param bytesTotal total bytes
      */
     void updateProgress(final int id, final long bytesCurrent, final long bytesTotal) {
-        TransferRecord transfer = transfers.get(id);
+        final TransferRecord transfer = transfers.get(id);
         if (transfer != null) {
             transfer.bytesCurrent = bytesCurrent;
             transfer.bytesTotal = bytesTotal;
         }
+
+        // Don't fire off the update too frequently, but still fire when it
+        // comes to the last byte.
+        final long timeInMillis = System.currentTimeMillis();
+
+        // update bytes transfered so that the transfer observer may pick it
+        // up.
+        dbUtil.updateBytesTransferred(id, bytesCurrent);
 
         // invoke listeners
         final List<TransferListener> list = listeners.get(id);
@@ -204,9 +212,7 @@ class TransferStatusUpdater {
             return;
         }
 
-        // Don't fire off the update too frequently, but still fire when it
-        // comes to the last byte.
-        long timeInMillis = System.currentTimeMillis();
+
         if (!lastUpdateTime.containsKey(id)
                 || timeInMillis - lastUpdateTime.get(id) > UPDATE_THRESHOLD_MS
                 || bytesCurrent == bytesTotal) {
@@ -216,7 +222,7 @@ class TransferStatusUpdater {
             mainHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (TransferListener l : list) {
+                    for (final TransferListener l : list) {
                         l.onProgressChanged(id, bytesCurrent, bytesTotal);
                     }
                 }
@@ -241,7 +247,7 @@ class TransferStatusUpdater {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                for (TransferListener l : list) {
+                for (final TransferListener l : list) {
                     l.onError(id, e);
                 }
             }
@@ -292,7 +298,7 @@ class TransferStatusUpdater {
         if (listener == null) {
             throw new IllegalArgumentException("Listener can't be null");
         }
-        List<TransferListener> list = listeners.get(id);
+        final List<TransferListener> list = listeners.get(id);
         if (list == null || list.isEmpty()) {
             return;
         }
@@ -305,18 +311,29 @@ class TransferStatusUpdater {
     private class TransferProgressListener implements ProgressListener {
 
         private final TransferRecord transfer;
+        /*
+         * Current transfer progress per task. In a multipart upload, this value
+         * is per upload part task. The purpose is to reset the progress upon a
+         * reset event.
+         */
+        private long bytesCurrent;
 
         public TransferProgressListener(TransferRecord transfer) {
             this.transfer = transfer;
         }
 
         @Override
-        public void progressChanged(ProgressEvent progressEvent) {
-            // TODO: handle retry of upload where progress could be problematic.
-            if (progressEvent.getBytesTransferred() > 0) {
+        public synchronized void progressChanged(ProgressEvent progressEvent) {
+            if (progressEvent.getEventCode() == ProgressEvent.RESET_EVENT_CODE) {
+                // Reset will discard what's been transferred, so subtract the
+                // bytes transferred in this task from the total progress.
+                transfer.bytesCurrent -= bytesCurrent;
+                bytesCurrent = 0;
+            } else {
+                bytesCurrent += progressEvent.getBytesTransferred();
                 transfer.bytesCurrent += progressEvent.getBytesTransferred();
-                updateProgress(transfer.id, transfer.bytesCurrent, transfer.bytesTotal);
             }
+            updateProgress(transfer.id, transfer.bytesCurrent, transfer.bytesTotal);
         }
     }
 
@@ -325,16 +342,13 @@ class TransferStatusUpdater {
      * transferred bytes and total bytes.
      *
      * @param id id of the transfer
-     * @param bytesCurrent current transferred data in bytes
-     * @param bytesTotal total data to transfer in bytes
      * @return a progress listener
      */
-    ProgressListener newProgressListener(int id, long bytesCurrent, long bytesTotal) {
-        TransferRecord transfer = getTransfer(id);
+    ProgressListener newProgressListener(int id) {
+        final TransferRecord transfer = getTransfer(id);
         if (transfer == null) {
             throw new IllegalArgumentException("transfer " + id + " doesn't exist");
         }
-        updateProgress(id, bytesCurrent, bytesTotal);
         return new TransferProgressListener(transfer);
     }
 }
