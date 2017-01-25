@@ -327,7 +327,7 @@ public class DefaultDeliveryClient implements DeliveryClient {
 
             }
             context.getSystem().getPreferences().putInt(EVENTS_SUBMITTED, totalEvent);
-
+            context.getSystem().getPreferences().putLong(EVENTS_SUBMITTED_TIME, time);
             for (DeliveryPolicy policy : policies) {
                 policy.handleDeliveryAttempt(submitted);
             }
