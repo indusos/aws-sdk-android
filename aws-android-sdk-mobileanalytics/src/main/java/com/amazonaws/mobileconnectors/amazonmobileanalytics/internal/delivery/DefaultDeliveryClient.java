@@ -50,7 +50,9 @@ public class DefaultDeliveryClient implements DeliveryClient {
     public static final String EVENTS_DIRECTORY = "events";
     private static final String USER_AGENT = MobileAnalyticsManager.class.getName() + "/"
             + VersionInfoUtils.getVersion();
-
+    private static final String EVENTS_SUBMITTED = "eventsSubmitted";
+    private static final String EVENTS_SUBMITTED_TIME = "eventsSubmittedTime";
+    private static final long TIME_DIFF_FOR_24_HRS_IN_MILLIS = 86400L;
     private static final String TAG = "DefaultDeliveryClient";
     private final static int MAX_EVENT_OPERATIONS = 1000;
     private final static int MAX_SUBMIT_OPERATIONS = 100;
@@ -82,7 +84,7 @@ public class DefaultDeliveryClient implements DeliveryClient {
     }
 
     public static DefaultDeliveryClient newInstance(AnalyticsContext context,
-            boolean allowWANDelivery) {
+                                                    boolean allowWANDelivery) {
 
         // create a service that is single threaded and only allows
         // MAX_OPERATIONS to be enqueued at one time
@@ -91,7 +93,7 @@ public class DefaultDeliveryClient implements DeliveryClient {
                         MAX_EVENT_OPERATIONS), new ThreadPoolExecutor.DiscardPolicy());
         ExecutorService submissionsExService = new ThreadPoolExecutor(1, 1, 0L,
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(
-                        MAX_SUBMIT_OPERATIONS), new ThreadPoolExecutor.DiscardPolicy());
+                MAX_SUBMIT_OPERATIONS), new ThreadPoolExecutor.DiscardPolicy());
         ERSRequestBuilder requestBuilder = new ERSRequestBuilder();
         DefaultDeliveryPolicyFactory policyFactory = new DefaultDeliveryPolicyFactory(context,
                 allowWANDelivery);
@@ -102,10 +104,10 @@ public class DefaultDeliveryClient implements DeliveryClient {
     }
 
     DefaultDeliveryClient(AnalyticsContext context, DefaultDeliveryPolicyFactory policyFactory,
-            final ExecutorService eventsRunnableQueue,
-            final ExecutorService submissionRunnableQueue, ERSRequestBuilder requestBuilder,
-            EventStore eventStore,
-            EventAdapter<JSONObject> eventAdapter) {
+                          final ExecutorService eventsRunnableQueue,
+                          final ExecutorService submissionRunnableQueue, ERSRequestBuilder requestBuilder,
+                          EventStore eventStore,
+                          EventAdapter<JSONObject> eventAdapter) {
         this.policyFactory = policyFactory;
         this.eventsRunnableQueue = eventsRunnableQueue;
         this.submissionRunnableQueue = submissionRunnableQueue;
@@ -158,7 +160,7 @@ public class DefaultDeliveryClient implements DeliveryClient {
     }
 
     private void calculateAndSetAverageWriteEventTime(long origEventsProcessed,
-            long enqueueTimeMillis) {
+                                                      long enqueueTimeMillis) {
         long currentEventsProcessed = eventsProcessed.addAndGet(1L);
         long eventsWrittenDelta = currentEventsProcessed - origEventsProcessed;
         long durationInMillis = System.currentTimeMillis() - enqueueTimeMillis;
@@ -192,12 +194,12 @@ public class DefaultDeliveryClient implements DeliveryClient {
      * checking the first condition)
      *
      * @param long lastSubmissionAttemptTime The last time we attempted to
-     *        submit to ERS
+     *             submit to ERS
      * @param long minimumSubmissionInternal The minimum amount of time we must
-     *        wait between submissions to ERS
+     *             wait between submissions to ERS
      */
     boolean shouldAttemptDelivery(long lastSubmissionAttemptTime,
-            long minimumSubmissionInterval) {
+                                  long minimumSubmissionInterval) {
         return (System.currentTimeMillis() - lastSubmissionAttemptTime > minimumSubmissionInterval || System
                 .currentTimeMillis()
                 - lastSubmissionAttemptTime < 0);
@@ -317,6 +319,14 @@ public class DefaultDeliveryClient implements DeliveryClient {
             context.getERSClient().putEvents(request);
             submitted = true;
             Log.i(TAG, String.format("Successful submission of %d events", eventArray.length()));
+
+            long time = context.getSystem().getPreferences().getLong(EVENTS_SUBMITTED_TIME, 0L);
+            int totalEvent = eventArray.length();
+            if (System.currentTimeMillis() - time <= TIME_DIFF_FOR_24_HRS_IN_MILLIS) {
+                totalEvent += context.getSystem().getPreferences().getInt(EVENTS_SUBMITTED, 0);
+
+            }
+            context.getSystem().getPreferences().putInt(EVENTS_SUBMITTED, totalEvent);
 
             for (DeliveryPolicy policy : policies) {
                 policy.handleDeliveryAttempt(submitted);
